@@ -24,14 +24,17 @@ class Neural_Net(object):
         self.targets = [self.make_targets(t, outputs) for t in range(outputs)]
 
     def small_rands(self, size):
+        """Return array randomized with -.25< w <.25 """
         return ((np.random.random_sample(size) - 0.5) / 2)
 
     def make_targets(self, target, outputs):
+        """Return numpy array with target set to .9"""
         b = (np.ones(outputs)) * 0.1
         b[target] = 0.9
         return b
 
     def train(self, learning_rate, momentum, training_data, test_data, max_epochs):
+        """Train neural net on a given data set, with given hyper-parameters"""
         for i in range(max_epochs):
             # Shuffle data for each epoch
             random.shuffle(training_data)
@@ -41,6 +44,7 @@ class Neural_Net(object):
                 # Propogate forward, calculating activations
                 # activations[0] are input units, activations[1], hidden units,etc
                 activations = [x,[],[]]
+                # Range is (layers - 1) of network, hardcoded here
                 for n in range(2):
                     for b, w in zip(self.biases[n], self.weights[n]):
                         z = np.dot(w, activations[n]) + b
@@ -74,11 +78,13 @@ class Neural_Net(object):
             print "Epoch {}: Training Accuracy {:01.2f}\tTest Accuracy {:01.2f}".format(i,train_acc,test_acc)
       
     def classify(self, x):
+        """Classify an instance with forward propagation, returns index of class"""
         for b, w in zip(self.biases, self.weights):
             x = sigmoid(np.dot(w, x) + b)
         return np.argmax(x)
 
     def test(self, test_data):
+        """Return the accuracy on a dataset"""
         total = len(test_data)
         correct = 0
         #conf_matrix = [[0] * 26 for x in range(26)]
@@ -91,6 +97,7 @@ class Neural_Net(object):
         return acc
 
 def import_data(my_file):
+    """Import a CSV file into tuples of format (t,x)"""
     letters = []
     with open(my_file) as csvfile:
         reader = csv.reader(csvfile)
@@ -107,6 +114,7 @@ def divide_data(letters):
     return training_data, test_data
 
 def get_features(instances):
+    """Return mean and std dev of all features in data set"""
     mean = [0 for x in range(16)]
     std_dev = [0 for x in range(16)]
     features = [[] for x in range(16)]
@@ -120,6 +128,7 @@ def get_features(instances):
     return mean, std_dev
 
 def standardize(instances, mean, std_dev):
+    """Standardize data set with arrays of mean, std_dev of features"""
     for c, data in instances:
         for i in range(16):
             data[i] = (data[i] - mean[i]) / std_dev[i]
